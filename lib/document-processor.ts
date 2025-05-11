@@ -45,7 +45,23 @@ PART V—FINANCIAL PROVISIONS
 20. Power to borrow and invest.
 21. Power to impose fees for services.
 22. Exemption from tax.
-23. Air ticket, charter and cargo sales charge.`
+23. Air ticket, charter and cargo sales charge.
+
+PART VI—SAFETY REGULATIONS
+30. Safety Oversight and Regulation.
+31. Aircraft Operations and Maintenance Standards.
+32. Personnel Licensing and Training Requirements.
+33. Safety Management Systems.
+34. Accident and Incident Investigation.
+35. Safety Data Collection and Analysis.
+
+PART VII—AIRCRAFT OPERATIONS
+40. Aircraft Registration Requirements.
+41. Airworthiness Certification.
+42. Operating Certificates and Licenses.
+43. Flight Operations and Standards.
+44. Maintenance Requirements.
+45. Flight Crew Requirements.`
 
     // Process the content into sections
     return processActContent(actContent)
@@ -142,16 +158,55 @@ export async function getSectionsByPart(part: string) {
   }
 }
 
-// Search sections by query
+// Improved search function with better relevance scoring
 export async function searchSections(query: string) {
   try {
     const sections = await loadCivilAviationAct()
     const lowerQuery = query.toLowerCase()
+    const queryTerms = lowerQuery.split(/\s+/).filter((term) => term.length > 2)
 
-    return sections.filter(
-      (section) =>
-        section.title.toLowerCase().includes(lowerQuery) || section.content.toLowerCase().includes(lowerQuery),
-    )
+    // Score each section based on relevance to the query
+    const scoredSections = sections.map((section) => {
+      const titleLower = section.title.toLowerCase()
+      const contentLower = section.content.toLowerCase()
+
+      let score = 0
+
+      // Check for exact phrase match (highest priority)
+      if (titleLower.includes(lowerQuery) || contentLower.includes(lowerQuery)) {
+        score += 100
+      }
+
+      // Check for individual term matches
+      queryTerms.forEach((term) => {
+        // Title matches are weighted higher
+        if (titleLower.includes(term)) {
+          score += 10
+        }
+
+        // Content matches
+        if (contentLower.includes(term)) {
+          score += 5
+
+          // Bonus for multiple occurrences
+          const occurrences = (contentLower.match(new RegExp(term, "g")) || []).length
+          if (occurrences > 1) {
+            score += Math.min(occurrences, 5) // Cap at 5 bonus points
+          }
+        }
+      })
+
+      return {
+        ...section,
+        score,
+      }
+    })
+
+    // Filter out irrelevant sections and sort by score
+    return scoredSections
+      .filter((section) => section.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(({ score, ...section }) => section) // Remove the score property
   } catch (error) {
     console.error(`Failed to search sections for "${query}":`, error)
     return []
