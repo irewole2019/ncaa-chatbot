@@ -109,3 +109,112 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(156, 163, 175, 0.8);
 }
+
+/* Enhanced markdown styling */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.prose h1 {
+  font-size: 1.5rem;
+}
+
+.prose h2 {
+  font-size: 1.25rem;
+}
+
+.prose h3 {
+  font-size: 1.125rem;
+}
+
+.prose p {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.prose ul,
+.prose ol {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
+
+.prose li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.prose blockquote {
+  margin: 1em 0;
+  padding-left: 1em;
+  border-left-width: 4px;
+  font-style: italic;
+}
+
+.prose code {
+  font-family: monospace;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.prose pre {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 1em;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.prose hr {
+  margin: 2em 0;
+  border-top-width: 1px;
+}
+
+.prose a {
+  text-decoration: underline;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+/* Dark mode adjustments */
+.dark .prose blockquote {
+  border-left-color: rgba(156, 163, 175, 0.5);
+}
+
+.dark .prose code {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .prose pre {
+  background-color: rgba(255, 255, 255, 0.1);
+}

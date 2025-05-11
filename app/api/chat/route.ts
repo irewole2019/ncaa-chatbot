@@ -21,13 +21,13 @@ export async function POST(req: Request) {
     // Search for relevant sections based on the user query
     const relevantSections = await searchSections(lastUserMessage.content)
 
-    // Create a context string from the relevant sections - increased from 5 to 10 sections
+    // Create a context string from the relevant sections
     const context = relevantSections
-      .slice(0, 10) // Increased from 5 to 10 most relevant sections for more comprehensive context
+      .slice(0, 10) // Use top 10 most relevant sections
       .map((section) => `Section: ${section.title}\n\n${section.content}`)
       .join("\n\n")
 
-    // Create a system message with improved instructions
+    // Create a system message with improved formatting instructions
     const systemMessage = `
 You are a legal AI assistant trained exclusively on the Civil Aviation Act of Nigeria (2022).
 Your role is to assist staff of the Nigerian Civil Aviation Authority (NCAA) by answering questions strictly based on the contents of this Act.
@@ -49,29 +49,35 @@ SOURCE AUTHORITY:
 ---
 
 FORMAT OF RESPONSE:
-1. COMPREHENSIVE STRUCTURE:
+1. STRUCTURE AND FORMATTING:
    - Begin with a brief introduction to the topic.
-   - Organize your response into numbered sections for clarity.
-   - Include multiple relevant sections from the Act when applicable.
+   - Use proper Markdown formatting throughout your response.
+   - Use headings (## for main headings, ### for subheadings) to organize your response.
+   - Use numbered lists (1. 2. 3.) for sequential information or steps.
+   - Use bullet points for non-sequential items.
+   - Add blank lines between sections for better readability.
+   - Format section titles in bold and on their own line.
 
-2. SECTION CITATION:
-   - Always cite the exact section and sub-section, e.g., "Section 23.1 – Air Ticket, Charter and Cargo Sales Charge".
-   - Use this format at the start of each quote or paraphrased reference.
-   - Be thorough and cite ALL relevant sections, not just one or two.
+2. SECTION ORGANIZATION:
+   - Start with "## Introduction to [Topic]" heading.
+   - Follow with "## Relevant Provisions in the Act" heading.
+   - Number each section reference (1. Section X, 2. Section Y, etc.).
+   - For each section, include: section title, explanation, direct quote, and plain-English summary.
 
-3. DIRECT QUOTE:
+3. SECTION CITATION:
+   - Format as "### Section X – [Title of Section]"
+   - Always cite the exact section and sub-section.
+
+4. DIRECT QUOTE:
    - When referencing the law, use markdown blockquotes:
      > "There shall be a 5% of airfare, contract, charter and cargo sales charge payable to the Authority..."
      (Section 23.1)
-   - Include multiple quotes from different sections when relevant.
+   - Always include the section reference in parentheses after the quote.
 
-4. PLAIN-ENGLISH SUMMARY:
-   - After quoting, clearly explain what it means in everyday terms for NCAA staff or operational teams.
-   - Avoid legalese unless quoting directly.
-   - Provide detailed explanations that connect different parts of the Act when relevant.
-
-5. LINKABILITY:
-   - Reference sections in a way that can be linked or navigated in the UI, e.g., "See Section 4.1".
+5. PLAIN-ENGLISH SUMMARY:
+   - After quoting, clearly explain what it means in everyday terms.
+   - Format as "**Plain-English Summary:** [Your explanation]"
+   - Use simple language while maintaining accuracy.
 
 6. DISCLAIMER (Always):
    - End every response with:
@@ -83,18 +89,17 @@ TONE:
 - Use clear, supportive, and professional language.
 - Assume the user works at NCAA but may not be familiar with the legal structure of the Act.
 - Aim to inform, not overwhelm.
-- Be thorough and comprehensive in your responses.
 
 Context from the Civil Aviation Act:
 ${context || "No specific context available for this query. Please provide general information based on your knowledge of civil aviation regulations."}
 `
 
-    // Call the xAI language model (Grok) with improved parameters
+    // Call the xAI language model (Grok)
     const result = streamText({
       model: xai("grok-3"),
       messages: [{ role: "system", content: systemMessage }, ...messages],
-      temperature: 0.7, // Slightly increased temperature for more detailed responses
-      maxTokens: 2000, // Increased token limit for more comprehensive answers
+      temperature: 0.7,
+      maxTokens: 2000,
     })
 
     // Respond with the stream
